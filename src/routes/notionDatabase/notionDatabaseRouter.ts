@@ -34,7 +34,7 @@ export const notionDatabaseRegistry = new OpenAPIRegistry();
 notionDatabaseRegistry.register('Notion Database', NotionDatabaseStructureViewerResponseSchema);
 notionDatabaseRegistry.registerPath({
   method: 'post',
-  path: '/notion-database/view-structure',
+  path: '/api/notion-database/view-structure',
   tags: ['Notion Database'],
   request: {
     body: createApiRequestBody(NotionDatabaseStructureViewerRequestBodySchema, 'application/json'),
@@ -44,7 +44,7 @@ notionDatabaseRegistry.registerPath({
 
 notionDatabaseRegistry.registerPath({
   method: 'post',
-  path: '/notion-database/create-page',
+  path: '/api/notion-database/create-page',
   tags: ['Notion Database'],
   request: {
     body: createApiRequestBody(NotionDatabaseCreatePageRequestBodySchema, 'application/json'),
@@ -54,7 +54,7 @@ notionDatabaseRegistry.registerPath({
 
 notionDatabaseRegistry.registerPath({
   method: 'patch',
-  path: '/notion-database/update-page',
+  path: '/api/notion-database/update-page',
   tags: ['Notion Database'],
   request: {
     body: createApiRequestBody(NotionDatabaseUpdatePageRequestBodySchema, 'application/json'),
@@ -64,7 +64,7 @@ notionDatabaseRegistry.registerPath({
 
 notionDatabaseRegistry.registerPath({
   method: 'patch',
-  path: '/notion-database/archive-page',
+  path: '/api/notion-database/archive-page',
   tags: ['Notion Database'],
   request: {
     body: createApiRequestBody(NotionDatabaseArchivePageRequestBodySchema, 'application/json'),
@@ -74,7 +74,7 @@ notionDatabaseRegistry.registerPath({
 
 notionDatabaseRegistry.registerPath({
   method: 'post',
-  path: '/notion-database/query-pages',
+  path: '/api/notion-database/query-pages',
   tags: ['Notion Database'],
   request: {
     body: createApiRequestBody(NotionDatabaseQueryPageRequestBodySchema, 'application/json'),
@@ -84,7 +84,7 @@ notionDatabaseRegistry.registerPath({
 
 notionDatabaseRegistry.registerPath({
   method: 'post',
-  path: '/notion-database/create-database',
+  path: '/api/notion-database/create-database',
   tags: ['Notion Database'],
   request: {
     body: createApiRequestBody(NotionDatabaseMakerRequestBodySchema, 'application/json'),

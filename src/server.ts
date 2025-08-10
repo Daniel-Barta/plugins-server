@@ -36,14 +36,14 @@ app.use((req, res, next) => {
 app.use(requestLogger());
 
 // Routes
-app.use('/health-check', healthCheckRouter);
-app.use('/images', express.static('public/images'));
-app.use('/youtube-transcript', youtubeTranscriptRouter);
-app.use('/web-page-reader', webPageReaderRouter);
-app.use('/powerpoint-generator', powerpointGeneratorRouter);
-app.use('/word-generator', wordGeneratorRouter);
-app.use('/excel-generator', excelGeneratorRouter);
-app.use('/notion-database', notionDatabaseRouter);
+app.use('/api/health-check', healthCheckRouter);
+app.use('/api/images', express.static('public/images'));
+app.use('/api/youtube-transcript', youtubeTranscriptRouter);
+app.use('/api/web-page-reader', webPageReaderRouter);
+app.use('/api/powerpoint-generator', powerpointGeneratorRouter);
+app.use('/api/word-generator', wordGeneratorRouter);
+app.use('/api/excel-generator', excelGeneratorRouter);
+app.use('/api/notion-database', notionDatabaseRouter);
 
 // Swagger UI
 app.use(openAPIRouter);

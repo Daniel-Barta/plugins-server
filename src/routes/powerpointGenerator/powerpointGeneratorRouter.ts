@@ -19,7 +19,7 @@ export const powerpointGeneratorRegistry = new OpenAPIRegistry();
 powerpointGeneratorRegistry.register('PowerpointGenerator', PowerpointGeneratorResponseSchema);
 powerpointGeneratorRegistry.registerPath({
   method: 'post',
-  path: '/powerpoint-generator/generate',
+  path: '/api/powerpoint-generator/generate',
   tags: ['Powerpoint Generator'],
   request: {
     body: createApiRequestBody(PowerpointGeneratorRequestBodySchema, 'application/json'),

@@ -64,7 +64,7 @@ export const webPageReaderRouter: Router = (() => {
 
   articleReaderRegistry.registerPath({
     method: 'get',
-    path: '/web-page-reader/get-content',
+    path: '/api/web-page-reader/get-content',
     tags: ['Web Page Reader'],
     request: {
       query: WebPageReaderRequestParamSchema,

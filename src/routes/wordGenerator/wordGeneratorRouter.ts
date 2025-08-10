@@ -36,7 +36,7 @@ export const wordGeneratorRegistry = new OpenAPIRegistry();
 wordGeneratorRegistry.register('WordGenerator', WordGeneratorResponseSchema);
 wordGeneratorRegistry.registerPath({
   method: 'post',
-  path: '/word-generator/generate',
+  path: '/api/word-generator/generate',
   tags: ['Word Generator'],
   request: {
     body: createApiRequestBody(WordGeneratorRequestBodySchema, 'application/json'),
