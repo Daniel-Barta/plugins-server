@@ -1,133 +1,127 @@
 # Headless Browser Reader
 
-This router provides a headless browser-based web page content extraction service that uses Puppeteer to fetch and extract content from web pages. This is more robust than the regular web page reader as it can handle JavaScript-rendered content and bypass certain bot detection mechanisms.
+This module provides advanced web scraping capabilities with comprehensive browser fingerprint randomization to avoid detection by anti-bot systems.
 
-## Features
+## Enhanced Randomization Features
 
-- **JavaScript Support**: Can extract content from pages that require JavaScript to render
-- **Bot Detection Avoidance**: Uses realistic user agents and browser settings
-- **Flexible Waiting**: Can wait for specific selectors to appear before extracting content
-- **Timeout Control**: Configurable timeout for page loading
-- **Content Cleaning**: Automatically removes ads, navigation, and other unwanted elements
-- **Browser Instance Reuse**: Reuses browser instances for better performance
+### 1. **User Agent Randomization**
 
-## API Endpoints
+- Rotates between 20+ realistic user agents from Chrome, Firefox, Edge, and Safari
+- Includes different operating systems (Windows, macOS, Linux)
+- Uses recent browser versions to avoid outdated fingerprints
 
-### GET `/api/headless-browser-reader/get-content`
+### 2. **Viewport & Screen Resolution**
 
-Extracts content from a web page using a headless browser.
+- Randomizes viewport dimensions from common screen resolutions
+- Includes popular resolutions like 1920x1080, 1366x768, 1440x900, etc.
+- Prevents detection based on consistent screen size
 
-**Query Parameters:**
+### 3. **HTTP Headers Randomization**
 
-- `url` (string, required): The URL of the web page to read
-- `waitForSelector` (string, optional): CSS selector to wait for before extracting content
-- `timeout` (number, optional): Timeout in milliseconds (1000-30000, default: 10000)
+- Randomizes Accept-Language headers
+- Varies Do Not Track (DNT) settings
+- Sets realistic accept encoding and connection headers
+- Includes security headers like Sec-Fetch-\* to mimic real browsers
 
-**Headers:**
+### 4. **Browser Fingerprinting Evasion**
 
-- `x-api-key`: Required API key for authentication
+- **WebDriver Detection**: Removes `navigator.webdriver` property
+- **Plugin Spoofing**: Mocks realistic browser plugins
+- **Language Settings**: Randomizes navigator.languages array
+- **Hardware Spoofing**: Randomizes CPU cores and device memory
+- **Chrome Object**: Mocks Chrome-specific APIs with realistic values
+- **Permissions API**: Handles permission queries realistically
+- **Screen Properties**: Sets consistent color depth and pixel depth
 
-**Response:**
+### 5. **Advanced Fingerprint Protection**
 
-```json
-{
-  "success": true,
-  "message": "Content fetched successfully using headless browser",
-  "responseObject": {
-    "title": "Page Title",
-    "content": "Extracted text content...",
-    "url": "https://example.com"
-  }
-}
+- **Canvas Fingerprinting**: Adds noise to canvas.toDataURL() output
+- **WebGL Fingerprinting**: Randomizes GPU vendor and renderer strings
+- **WebRTC Blocking**: Prevents IP leak through WebRTC
+- **Battery API**: Mocks battery status with random values
+- **Media Devices**: Blocks microphone/camera access requests
+- **Timezone Spoofing**: Randomizes timezone offset
+
+### 6. **Human Behavior Simulation**
+
+- **Mouse Movements**: Simulates 0-5 random mouse movements per page
+- **Scrolling**: Occasionally simulates realistic scrolling behavior
+- **Click Simulation**: Rarely simulates random clicks (10% chance)
+- **Reading Time**: Adds random delays to simulate human reading
+- **Navigation Delays**: Random delays before and after page navigation
+
+### 7. **Timing Randomization**
+
+- Random delays between actions (1000ms - 3000ms)
+- Variable page loading wait times
+- Randomized mouse movement timing
+- Simulated reading time delays
+
+### 8. **Launch Arguments Optimization**
+
+- Disables automation detection features
+- Optimizes browser performance for scraping
+- Randomizes process limits and memory settings
+- Disables unnecessary browser features
+
+## Usage
+
+The randomization is automatic and requires no additional configuration:
+
+```typescript
+// Basic usage - all randomization is applied automatically
+const content = await fetchContentWithHeadlessBrowser(
+  'https://example.com',
+  '.content', // optional selector to wait for
+  10000, // timeout in ms
+  'domcontentloaded' // wait strategy
+);
 ```
 
-### POST `/api/headless-browser-reader/cleanup`
+## Anti-Detection Strategies
 
-Manually cleanup the browser instance (useful for resource management).
+### What This Prevents:
 
-**Headers:**
+1. **Basic Bot Detection**: User agent and viewport checking
+2. **Behavioral Analysis**: Consistent timing patterns
+3. **Fingerprinting**: Canvas, WebGL, and hardware fingerprinting
+4. **Automation Detection**: WebDriver property and Chrome automation flags
+5. **Network Analysis**: Consistent header patterns
+6. **Mouse/Interaction Tracking**: Lack of human-like interactions
 
-- `x-api-key`: Required API key for authentication
+### Additional Recommendations:
 
-**Response:**
+1. **Use Proxies**: Rotate IP addresses for large-scale scraping
+2. **Rate Limiting**: Add delays between requests
+3. **Session Management**: Don't reuse browser instances too long
+4. **Cookie Handling**: Manage cookies appropriately
+5. **Error Handling**: Handle CAPTCHAs and blocks gracefully
 
-```json
-{
-  "success": true,
-  "message": "Browser instance cleaned up successfully",
-  "responseObject": null
-}
+## Browser Instance Management
+
+The module uses a single browser instance that's reused for multiple requests to improve performance. The instance is automatically cleaned up on process termination.
+
+To manually clean up:
+
+```http
+POST /api/headless-browser-reader/cleanup
 ```
 
-## Usage Examples
+## Troubleshooting
 
-### Basic Usage
+If you're still getting blocked:
 
-```bash
-curl -X GET "http://localhost:3000/api/headless-browser-reader/get-content?url=https://example.com" \
-  -H "x-api-key: your-api-key"
-```
+1. **Check User Agents**: Ensure you're using recent browser versions
+2. **Verify Headers**: Some sites check for specific headers
+3. **Add More Delays**: Increase random delays between actions
+4. **Use Proxies**: Some sites block based on IP reputation
+5. **Monitor Network**: Check if site uses additional detection methods
+6. **Update Evasion**: Browser detection methods evolve constantly
 
-### With Wait Selector
+## Technical Notes
 
-```bash
-curl -X GET "http://localhost:3000/api/headless-browser-reader/get-content?url=https://example.com&waitForSelector=.main-content" \
-  -H "x-api-key: your-api-key"
-```
-
-### With Custom Timeout
-
-```bash
-curl -X GET "http://localhost:3000/api/headless-browser-reader/get-content?url=https://example.com&timeout=15000" \
-  -H "x-api-key: your-api-key"
-```
-
-### JavaScript Usage
-
-```javascript
-const response = await fetch('/api/headless-browser-reader/get-content?url=https://example.com', {
-  headers: {
-    'x-api-key': 'your-api-key',
-  },
-});
-
-const data = await response.json();
-console.log(data.responseObject.content);
-```
-
-## Differences from Regular Web Page Reader
-
-| Feature              | Web Page Reader | Headless Browser Reader |
-| -------------------- | --------------- | ----------------------- |
-| JavaScript Support   | ❌ No           | ✅ Yes                  |
-| Performance          | ⚡ Fast         | 🐌 Slower               |
-| Resource Usage       | 💾 Low          | 💾 High                 |
-| Bot Detection Bypass | ❌ Limited      | ✅ Better               |
-| Wait for Content     | ❌ No           | ✅ Yes                  |
-
-## Performance Considerations
-
-- The headless browser reader is more resource-intensive than the regular web page reader
-- Browser instances are reused to improve performance
-- Consider using cleanup endpoint periodically to free resources
-- Set appropriate timeouts to avoid hanging requests
-- Use this router only when JavaScript rendering is required
-
-## Error Handling
-
-The router handles various error scenarios:
-
-- Invalid URLs
-- Timeout errors
-- Browser launch failures
-- Page navigation errors
-- Network connectivity issues
-
-All errors are returned with appropriate HTTP status codes and descriptive messages.
-
-## Security
-
-- Requires API key authentication
-- Browser runs in secure mode with restricted permissions
-- No file system access from the browser context
-- Automatic cleanup on process termination
+- Uses Puppeteer with Chrome/Chromium in headless mode
+- All randomization is applied per page request
+- Browser fingerprinting evasion runs on every new document
+- Mouse and scroll simulation happens after page load
+- Compatible with existing API parameters and responses

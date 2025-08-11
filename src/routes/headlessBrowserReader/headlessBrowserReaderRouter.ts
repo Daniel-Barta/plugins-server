@@ -8,6 +8,15 @@ import { ResponseStatus, ServiceResponse } from '@/common/models/serviceResponse
 import { handleServiceResponse } from '@/common/utils/httpHandlers';
 
 import {
+  getRandomDelay,
+  getRandomizedLaunchArgs,
+  getRandomUserAgent,
+  getRandomViewport,
+  setRandomHeaders,
+  setupBrowserEvasion,
+  simulateHumanBehavior,
+} from './browserRandomization';
+import {
   HeadlessBrowserReaderRequestParamSchema,
   HeadlessBrowserReaderResponseSchema,
 } from './headlessBrowserReaderModel';
@@ -20,16 +29,8 @@ let browserInstance: Browser | null = null;
 const getBrowserInstance = async (): Promise<Browser> => {
   if (!browserInstance || !browserInstance.isConnected()) {
     browserInstance = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--disable-gpu',
-      ],
+      headless: true, // Keep as boolean for compatibility
+      args: getRandomizedLaunchArgs(),
     });
   }
   return browserInstance;
@@ -45,13 +46,22 @@ const fetchContentWithHeadlessBrowser = async (
   const page: Page = await browser.newPage();
 
   try {
-    // Set user agent to avoid bot detection
-    await page.setUserAgent(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    );
+    // Randomize user agent
+    const userAgent = getRandomUserAgent();
+    await page.setUserAgent(userAgent);
 
-    // Set viewport
-    await page.setViewport({ width: 1920, height: 1080 });
+    // Randomize viewport
+    const viewport = getRandomViewport();
+    await page.setViewport(viewport);
+
+    // Set randomized headers
+    await setRandomHeaders(page);
+
+    // Setup browser evasion techniques
+    await setupBrowserEvasion(page);
+
+    // Add random delay before navigation (simulate human behavior)
+    await new Promise((resolve) => setTimeout(resolve, getRandomDelay(500, 2000)));
 
     // Navigate to the page with configurable waiting strategy
     await page.goto(url, {
@@ -59,15 +69,22 @@ const fetchContentWithHeadlessBrowser = async (
       timeout,
     });
 
+    // Random delay after page load (simulate reading time)
+    const readingDelay = getRandomDelay(1000, 3000);
+    await new Promise((resolve) => setTimeout(resolve, readingDelay));
+
     // For faster strategies, wait a bit for dynamic content to load
     if (waitStrategy === 'domcontentloaded') {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, getRandomDelay(1500, 3000)));
     }
 
     // Wait for specific selector if provided
     if (waitForSelector) {
       await page.waitForSelector(waitForSelector, { timeout: 5000 });
     }
+
+    // Simulate human-like behavior
+    await simulateHumanBehavior(page, viewport);
 
     // Extract title and content
     const pageData = await page.evaluate(() => {
@@ -106,6 +123,9 @@ const fetchContentWithHeadlessBrowser = async (
 
       return { title, content };
     });
+
+    // Add small delay before closing (simulate human behavior)
+    await new Promise((resolve) => setTimeout(resolve, getRandomDelay(500, 1500)));
 
     return {
       title: pageData.title,
