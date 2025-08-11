@@ -17,6 +17,7 @@ export const healthCheckRouter: Router = (() => {
     path: '/api/health-check',
     tags: ['Health Check'],
     responses: createApiResponse(z.null(), 'Success'),
+    security: [{ ApiKeyAuth: [] }, {}], // Optional API key auth
   });
 
   router.get('/', (_req: Request, res: Response) => {

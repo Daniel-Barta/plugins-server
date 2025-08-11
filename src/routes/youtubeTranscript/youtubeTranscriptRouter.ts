@@ -23,6 +23,7 @@ export const youtubeTranscriptRouter: Router = (() => {
       query: YoutubeTranscriptRequestParamSchema,
     },
     responses: createApiResponse(YoutubeTranscriptResponseSchema, 'Success'),
+    security: [{ ApiKeyAuth: [] }],
   });
 
   router.get('/get-transcript', async (_req: Request, res: Response) => {

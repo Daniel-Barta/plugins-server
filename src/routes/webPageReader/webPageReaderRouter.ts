@@ -70,6 +70,7 @@ export const webPageReaderRouter: Router = (() => {
       query: WebPageReaderRequestParamSchema,
     },
     responses: createApiResponse(WebPageReaderResponseSchema, 'Success'),
+    security: [{ ApiKeyAuth: [] }],
   });
 
   router.get('/get-content', async (_req: Request, res: Response) => {

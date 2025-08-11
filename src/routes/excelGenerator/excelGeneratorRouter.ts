@@ -23,6 +23,7 @@ excelGeneratorRegistry.registerPath({
     body: createApiRequestBody(ExcelGeneratorRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(ExcelGeneratorResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 // Create folder to contains generated files

@@ -25,6 +25,7 @@ powerpointGeneratorRegistry.registerPath({
     body: createApiRequestBody(PowerpointGeneratorRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(PowerpointGeneratorResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 // Create folder to contains generated files

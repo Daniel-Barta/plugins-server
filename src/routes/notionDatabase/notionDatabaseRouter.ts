@@ -40,6 +40,7 @@ notionDatabaseRegistry.registerPath({
     body: createApiRequestBody(NotionDatabaseStructureViewerRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(NotionDatabaseStructureViewerResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 notionDatabaseRegistry.registerPath({
@@ -50,6 +51,7 @@ notionDatabaseRegistry.registerPath({
     body: createApiRequestBody(NotionDatabaseCreatePageRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(NotionDatabaseCreatePageResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 notionDatabaseRegistry.registerPath({
@@ -60,6 +62,7 @@ notionDatabaseRegistry.registerPath({
     body: createApiRequestBody(NotionDatabaseUpdatePageRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(NotionDatabaseUpdatePageResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 notionDatabaseRegistry.registerPath({
@@ -70,6 +73,7 @@ notionDatabaseRegistry.registerPath({
     body: createApiRequestBody(NotionDatabaseArchivePageRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(NotionDatabaseArchivePageResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 notionDatabaseRegistry.registerPath({
@@ -80,6 +84,7 @@ notionDatabaseRegistry.registerPath({
     body: createApiRequestBody(NotionDatabaseQueryPageRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(NotionDatabaseQueryPageResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 notionDatabaseRegistry.registerPath({
@@ -90,6 +95,7 @@ notionDatabaseRegistry.registerPath({
     body: createApiRequestBody(NotionDatabaseMakerRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(NotionDatabaseMakerResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 const DEFAULT_ANNOTATIONS = {

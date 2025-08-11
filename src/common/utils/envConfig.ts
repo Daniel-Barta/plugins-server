@@ -3,6 +3,8 @@ import { cleanEnv, host, num, port, str } from 'envalid';
 
 dotenv.config();
 
+const isTest = process.env.NODE_ENV === 'test';
+
 export const env = cleanEnv(process.env, {
   NODE_ENV: str({ choices: ['development', 'test', 'production'], default: 'production' }),
   HOST: host({ default: 'localhost' }),
@@ -10,4 +12,8 @@ export const env = cleanEnv(process.env, {
   CORS_ORIGIN: str({ default: '*' }),
   COMMON_RATE_LIMIT_MAX_REQUESTS: num({ default: 100 }),
   COMMON_RATE_LIMIT_WINDOW_MS: num({ default: 60000 }),
+  API_KEY: str({
+    desc: 'API key for authentication',
+    default: isTest ? 'test-api-key-for-testing' : undefined,
+  }),
 });

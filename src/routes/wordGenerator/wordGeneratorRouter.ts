@@ -42,6 +42,7 @@ wordGeneratorRegistry.registerPath({
     body: createApiRequestBody(WordGeneratorRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(WordGeneratorResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 // Create folder to contains generated files

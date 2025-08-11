@@ -20,11 +20,13 @@ Plugins Server is open-sourced and is intended to be self-hosted by individual u
 
 ## 🔌 How to use (for Typing Mind users)
 
-Two simple steps:
+Three simple steps:
 
 1. Deploy this repo on any hosting provider that supports NodeJS (e.g., Render.com, AWS, etc.). (We also provide a Dockerfile for easy deployment on Docker-supported hosting providers).
 
-2. Install your desired TypingMind's plugin. Update the server endpoint URL in your Settings page.
+2. **Set up API Key Authentication**: Configure the `API_KEY` environment variable on your deployment. This key will be required for all API requests.
+
+3. Install your desired TypingMind's plugin. Update the server endpoint URL in your Settings page and configure the API key in your plugin settings.
 
 Follow this guide for detailed instructions: [How to Deploy Plugins Server on Render.com](https://docs.typingmind.com/plugins/plugins-server/how-to-deploy-plugins-server-on-render)
 
