@@ -1,6 +1,8 @@
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
+import { Readability } from '@mozilla/readability';
 import express, { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { JSDOM } from 'jsdom';
 import puppeteer, { Browser, Page } from 'puppeteer';
 
 import { createApiResponse } from '@/api-docs/openAPIResponseBuilders';
@@ -101,51 +103,67 @@ const fetchContentWithHeadlessBrowser = async (
     // Simulate human-like behavior
     await simulateHumanBehavior(page, viewport);
 
-    // Extract title and content
-    const pageData = await page.evaluate(() => {
-      // Remove unwanted elements
-      const elementsToRemove = [
-        'script',
-        'style',
-        'nav',
-        'header',
-        'footer',
-        'aside',
-        '.advertisement',
-        '.ads',
-        '.sidebar',
-        '[class*="ad-"]',
-        '[id*="ad-"]',
-      ];
+    // Extract content using Readability (cleaner article extraction)
+    const finalUrl = page.url();
+    const html = await page.content();
+    let title = await page.title();
+    let contentText = '';
 
-      elementsToRemove.forEach((selector) => {
-        const elements = document.querySelectorAll(selector);
-        elements.forEach((el) => el.remove());
+    try {
+      const dom = new JSDOM(html, { url: finalUrl });
+      const reader = new Readability(dom.window.document);
+      const article = reader.parse();
+      if (article && article.textContent && article.textContent.trim().length > 0) {
+        title = article.title || title;
+        contentText = article.textContent;
+      }
+    } catch (_e) {
+      // Ignore Readability errors and fallback
+    }
+
+    // Fallback to DOM-based extraction if Readability produced no text
+    if (!contentText) {
+      const fallback = await page.evaluate(() => {
+        const elementsToRemove = [
+          'script',
+          'style',
+          'nav',
+          'header',
+          'footer',
+          'aside',
+          '.advertisement',
+          '.ads',
+          '.sidebar',
+          '[class*="ad-"]',
+          '[id*="ad-"]',
+        ];
+
+        elementsToRemove.forEach((selector) => {
+          const elements = document.querySelectorAll(selector);
+          elements.forEach((el) => el.remove());
+        });
+
+        const contentElement =
+          document.querySelector('main') ||
+          document.querySelector('article') ||
+          document.querySelector('[role="main"]') ||
+          document.querySelector('.content') ||
+          document.querySelector('#content') ||
+          document.body;
+
+        const text = contentElement?.innerText || '';
+        return { text };
       });
-
-      const title = document.title || '';
-
-      // Try to get main content area first
-      const contentElement =
-        document.querySelector('main') ||
-        document.querySelector('article') ||
-        document.querySelector('[role="main"]') ||
-        document.querySelector('.content') ||
-        document.querySelector('#content') ||
-        document.body;
-
-      const content = contentElement?.innerText || '';
-
-      return { title, content };
-    });
+      contentText = fallback.text;
+    }
 
     // Add small delay before closing (simulate human behavior)
     await new Promise((resolve) => setTimeout(resolve, getRandomDelay(500, 1500)));
 
     return {
-      title: pageData.title,
-      content: pageData.content,
-      url,
+      title,
+      content: contentText,
+      url: finalUrl,
     };
   } finally {
     try {
