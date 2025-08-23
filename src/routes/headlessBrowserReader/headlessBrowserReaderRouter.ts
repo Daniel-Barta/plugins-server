@@ -167,43 +167,22 @@ export const headlessBrowserReaderRouter: Router = (() => {
   });
 
   router.get('/get-content', async (_req: Request, res: Response) => {
-    const { url, waitForSelector, timeout, waitStrategy } = _req.query;
-
-    if (typeof url !== 'string') {
-      const serviceResponse = new ServiceResponse(
-        ResponseStatus.Failed,
-        'URL must be a string',
-        null,
-        StatusCodes.BAD_REQUEST
-      );
+    // Validate request query with zod (runtime)
+    const parsed = HeadlessBrowserReaderRequestParamSchema.safeParse(_req.query);
+    if (!parsed.success) {
+      const message = parsed.error.errors.map((e) => e.message).join('; ');
+      const serviceResponse = new ServiceResponse(ResponseStatus.Failed, message, null, StatusCodes.BAD_REQUEST);
       return handleServiceResponse(serviceResponse, res);
     }
 
-    const timeoutMs = timeout ? Number(timeout) : 10000;
-
-    if (isNaN(timeoutMs) || timeoutMs < 1000 || timeoutMs > 30000) {
-      const serviceResponse = new ServiceResponse(
-        ResponseStatus.Failed,
-        'Timeout must be a number between 1000 and 30000',
-        null,
-        StatusCodes.BAD_REQUEST
-      );
-      return handleServiceResponse(serviceResponse, res);
-    }
-
-    // Validate wait strategy
-    const validStrategies = ['domcontentloaded', 'load', 'networkidle0', 'networkidle2'];
-    const strategy =
-      waitStrategy && validStrategies.includes(waitStrategy as string)
-        ? (waitStrategy as 'domcontentloaded' | 'load' | 'networkidle0' | 'networkidle2')
-        : 'domcontentloaded';
+    const { url, waitForSelector, timeout, waitStrategy } = parsed.data;
 
     try {
       const content = await fetchContentWithHeadlessBrowser(
         url,
-        waitForSelector as string | undefined,
-        timeoutMs,
-        strategy
+        waitForSelector,
+        timeout ?? 10000,
+        waitStrategy ?? 'domcontentloaded'
       );
 
       const serviceResponse = new ServiceResponse(

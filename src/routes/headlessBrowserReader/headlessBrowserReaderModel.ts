@@ -7,18 +7,37 @@ export type HeadlessBrowserReaderRequest = z.infer<typeof HeadlessBrowserReaderR
 export type HeadlessBrowserReaderResponse = z.infer<typeof HeadlessBrowserReaderResponseSchema>;
 
 export const HeadlessBrowserReaderRequestParamSchema = z.object({
-  url: z.string().url('Please provide a valid URL').openapi({
-    example: 'https://example.com',
-    description: 'The URL of the web page to read using headless browser',
-  }),
+  url: z
+    .string({ required_error: 'URL must be a string' })
+    .max(2048, 'URL is too long')
+    .url('Please provide a valid URL')
+    .refine((u) => {
+      try {
+        const p = new URL(u);
+        return p.protocol === 'http:' || p.protocol === 'https:';
+      } catch {
+        return false;
+      }
+    }, 'URL must use http or https protocol')
+    .openapi({
+      example: 'https://example.com',
+      description: 'The URL of the web page to read using headless browser',
+    }),
   waitForSelector: z.string().optional().openapi({
     example: '.content',
     description: 'CSS selector to wait for before extracting content (optional)',
   }),
-  timeout: z.number().int().min(1000).max(30000).default(10000).optional().openapi({
-    example: 10000,
-    description: 'Timeout in milliseconds for page loading (1000-30000, default: 10000)',
-  }),
+  timeout: z.coerce
+    .number()
+    .int()
+    .min(1000, 'Timeout must be a number between 1000 and 30000')
+    .max(30000, 'Timeout must be a number between 1000 and 30000')
+    .default(10000)
+    .optional()
+    .openapi({
+      example: 10000,
+      description: 'Timeout in milliseconds for page loading (1000-30000, default: 10000)',
+    }),
   waitStrategy: z
     .enum(['domcontentloaded', 'load', 'networkidle0', 'networkidle2'])
     .default('domcontentloaded')
