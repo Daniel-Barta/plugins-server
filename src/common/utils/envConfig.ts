@@ -20,4 +20,12 @@ export const env = cleanEnv(process.env, {
     desc: 'Whether to reuse browser instances across requests for better performance',
     default: false,
   }),
+  HEADLESS: bool({
+    desc: 'Run Puppeteer in headless mode',
+    default: true,
+  }),
+  PUPPETEER_EXECUTABLE_PATH: str({
+    desc: 'Optional custom executable path for puppeteer',
+    default: undefined,
+  }),
 });

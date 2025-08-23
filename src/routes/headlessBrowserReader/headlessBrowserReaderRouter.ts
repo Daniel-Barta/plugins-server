@@ -29,18 +29,23 @@ headlessBrowserReaderRegistry.register('Headless Browser Reader', HeadlessBrowse
 let browserInstance: Browser | null = null;
 
 const createNewBrowserInstance = async (): Promise<Browser> => {
-  return await puppeteer.launch({
-    headless: true, // Keep as boolean for compatibility
+  const browser = await puppeteer.launch({
+    headless: env.HEADLESS,
     args: getRandomizedLaunchArgs(),
+    executablePath: env.PUPPETEER_EXECUTABLE_PATH || undefined,
   });
+  // Reset reference on disconnect
+  browser.on('disconnected', () => {
+    if (browserInstance === browser) {
+      browserInstance = null;
+    }
+  });
+  return browser;
 };
 
 const getBrowserInstance = async (): Promise<Browser> => {
   if (!browserInstance || !browserInstance.connected) {
-    browserInstance = await puppeteer.launch({
-      headless: true, // Keep as boolean for compatibility
-      args: getRandomizedLaunchArgs(),
-    });
+    browserInstance = await createNewBrowserInstance();
   }
   return browserInstance;
 };
@@ -53,7 +58,6 @@ const fetchContentWithHeadlessBrowser = async (
 ) => {
   // Choose browser strategy based on environment variable
   const browser = env.REUSE_BROWSER_INSTANCE ? await getBrowserInstance() : await createNewBrowserInstance();
-
   const page: Page = await browser.newPage();
 
   try {
@@ -144,10 +148,18 @@ const fetchContentWithHeadlessBrowser = async (
       url,
     };
   } finally {
-    await page.close();
+    try {
+      await page.close();
+    } catch {
+      // ignore
+    }
     // Only close the browser instance if we're not reusing it
     if (!env.REUSE_BROWSER_INSTANCE) {
-      await browser.close();
+      try {
+        await browser.close();
+      } catch {
+        // ignore
+      }
     }
   }
 };
@@ -217,9 +229,12 @@ export const headlessBrowserReaderRouter: Router = (() => {
 
     router.post('/cleanup', async (_req: Request, res: Response) => {
       try {
-        if (browserInstance && browserInstance.isConnected()) {
-          await browserInstance.close();
-          browserInstance = null;
+        if (browserInstance && browserInstance.connected) {
+          try {
+            await browserInstance.close();
+          } finally {
+            browserInstance = null;
+          }
         }
         const serviceResponse = new ServiceResponse(
           ResponseStatus.Success,
@@ -246,15 +261,16 @@ export const headlessBrowserReaderRouter: Router = (() => {
 
 // Graceful shutdown handlers (only when reusing browser instances)
 if (env.REUSE_BROWSER_INSTANCE) {
-  process.on('SIGINT', async () => {
-    if (browserInstance && browserInstance.isConnected()) {
-      await browserInstance.close();
+  const shutdown = async () => {
+    if (browserInstance && browserInstance.connected) {
+      try {
+        await browserInstance.close();
+      } finally {
+        browserInstance = null;
+      }
     }
-  });
+  };
 
-  process.on('SIGTERM', async () => {
-    if (browserInstance && browserInstance.isConnected()) {
-      await browserInstance.close();
-    }
-  });
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
 }
