@@ -1,6 +1,7 @@
 import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 
 import { excelGeneratorRegistry } from '@/routes/excelGenerator/excelGeneratorRouter';
+import { fileReaderRegistry } from '@/routes/fileReader/fileReaderRouter';
 import { headlessBrowserReaderRegistry } from '@/routes/headlessBrowserReader/headlessBrowserReaderRouter';
 import { healthCheckRegistry } from '@/routes/healthCheck/healthCheckRouter';
 import { notionDatabaseRegistry } from '@/routes/notionDatabase/notionDatabaseRouter';
@@ -14,6 +15,7 @@ export function generateOpenAPIDocument() {
     healthCheckRegistry,
     youtubeTranscriptRegistry,
     articleReaderRegistry,
+    fileReaderRegistry,
     headlessBrowserReaderRegistry,
     powerpointGeneratorRegistry,
     wordGeneratorRegistry,

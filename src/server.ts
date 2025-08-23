@@ -12,6 +12,7 @@ import requestLogger from '@/common/middleware/requestLogger';
 import { healthCheckRouter } from '@/routes/healthCheck/healthCheckRouter';
 
 import { excelGeneratorRouter } from './routes/excelGenerator/excelGeneratorRouter';
+import { fileReaderRouter } from './routes/fileReader/fileReaderRouter';
 import { headlessBrowserReaderRouter } from './routes/headlessBrowserReader/headlessBrowserReaderRouter';
 import { notionDatabaseRouter } from './routes/notionDatabase/notionDatabaseRouter';
 import { powerpointGeneratorRouter } from './routes/powerpointGenerator/powerpointGeneratorRouter';
@@ -42,6 +43,7 @@ app.use('/api/health-check', optionalApiKeyAuth, healthCheckRouter);
 app.use('/api/images', apiKeyAuth, express.static('public/images'));
 app.use('/api/youtube-transcript', apiKeyAuth, youtubeTranscriptRouter);
 app.use('/api/web-page-reader', apiKeyAuth, webPageReaderRouter);
+app.use('/api/file-reader', apiKeyAuth, fileReaderRouter);
 app.use('/api/headless-browser-reader', apiKeyAuth, headlessBrowserReaderRouter);
 app.use('/api/powerpoint-generator', apiKeyAuth, powerpointGeneratorRouter);
 app.use('/api/word-generator', apiKeyAuth, wordGeneratorRouter);
