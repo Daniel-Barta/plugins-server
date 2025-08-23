@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { cleanEnv, host, num, port, str } from 'envalid';
+import { bool, cleanEnv, host, num, port, str } from 'envalid';
 
 dotenv.config();
 
@@ -15,5 +15,9 @@ export const env = cleanEnv(process.env, {
   API_KEY: str({
     desc: 'API key for authentication',
     default: isTest ? 'test-api-key-for-testing' : undefined,
+  }),
+  REUSE_BROWSER_INSTANCE: bool({
+    desc: 'Whether to reuse browser instances across requests for better performance',
+    default: false,
   }),
 });

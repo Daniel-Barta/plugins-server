@@ -99,13 +99,54 @@ const content = await fetchContentWithHeadlessBrowser(
 
 ## Browser Instance Management
 
-The module uses a single browser instance that's reused for multiple requests to improve performance. The instance is automatically cleaned up on process termination.
+The module supports two modes for browser instance management, controlled by the `REUSE_BROWSER_INSTANCE` environment variable:
 
-To manually clean up:
+### Default Mode (REUSE_BROWSER_INSTANCE=false)
+
+- **New browser per request**: Creates a fresh browser instance for each request
+- **Better isolation**: Each request gets a completely clean browser environment
+- **Enhanced randomization**: New randomization settings for every request
+- **Memory safety**: Browser processes are fully cleaned up after each request
+- **Slower performance**: ~1-2 second overhead per request for browser startup
+
+### Reuse Mode (REUSE_BROWSER_INSTANCE=true)
+
+- **Shared browser instance**: Reuses a single browser instance across multiple requests
+- **Better performance**: No browser startup overhead between requests
+- **Manual cleanup**: Browser instance persists until manually cleaned up or process termination
+- **Cleanup endpoint available**: Use the cleanup endpoint for manual browser management
+
+#### Manual Cleanup (Reuse Mode Only)
 
 ```http
 POST /api/headless-browser-reader/cleanup
 ```
+
+#### Environment Configuration
+
+```bash
+# Default: Create new browser for each request (recommended for isolation)
+REUSE_BROWSER_INSTANCE=false
+
+# Alternative: Reuse browser instance for better performance
+REUSE_BROWSER_INSTANCE=true
+```
+
+### Choosing the Right Mode
+
+**Use Default Mode (false) when:**
+
+- You need maximum isolation between requests
+- You're scraping sites with strict bot detection
+- Memory usage and cleanup are critical
+- You can tolerate slightly slower requests
+
+**Use Reuse Mode (true) when:**
+
+- You need maximum performance
+- You're making many requests in sequence
+- Target sites don't have strict bot detection
+- You can manage browser lifecycle manually
 
 ## Troubleshooting
 
