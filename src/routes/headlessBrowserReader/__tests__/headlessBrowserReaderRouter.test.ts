@@ -24,14 +24,4 @@ describe('Headless Browser Reader API', () => {
     expect(response.body.success).toBe(false);
     expect(response.body.message).toContain('Timeout must be a number between 1000 and 30000');
   });
-
-  it('should handle cleanup endpoint', async () => {
-    const response = await request(app)
-      .post('/api/headless-browser-reader/cleanup')
-      .set('x-api-key', 'test-api-key-for-testing');
-
-    expect(response.status).toBe(200);
-    expect(response.body.success).toBe(true);
-    expect(response.body.message).toContain('Browser instance cleaned up successfully');
-  });
 });

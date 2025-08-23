@@ -24,16 +24,11 @@ import {
 export const headlessBrowserReaderRegistry = new OpenAPIRegistry();
 headlessBrowserReaderRegistry.register('Headless Browser Reader', HeadlessBrowserReaderResponseSchema);
 
-let browserInstance: Browser | null = null;
-
-const getBrowserInstance = async (): Promise<Browser> => {
-  if (!browserInstance || !browserInstance.isConnected()) {
-    browserInstance = await puppeteer.launch({
-      headless: true, // Keep as boolean for compatibility
-      args: getRandomizedLaunchArgs(),
-    });
-  }
-  return browserInstance;
+const createNewBrowserInstance = async (): Promise<Browser> => {
+  return await puppeteer.launch({
+    headless: true, // Keep as boolean for compatibility
+    args: getRandomizedLaunchArgs(),
+  });
 };
 
 const fetchContentWithHeadlessBrowser = async (
@@ -42,7 +37,7 @@ const fetchContentWithHeadlessBrowser = async (
   timeout: number = 10000,
   waitStrategy: 'domcontentloaded' | 'load' | 'networkidle0' | 'networkidle2' = 'domcontentloaded'
 ) => {
-  const browser = await getBrowserInstance();
+  const browser = await createNewBrowserInstance();
   const page: Page = await browser.newPage();
 
   try {
@@ -134,6 +129,8 @@ const fetchContentWithHeadlessBrowser = async (
     };
   } finally {
     await page.close();
+    // Close the browser instance since we create a new one for each request
+    await browser.close();
   }
 };
 
@@ -211,44 +208,5 @@ export const headlessBrowserReaderRouter: Router = (() => {
     }
   });
 
-  // Cleanup route for graceful shutdown
-  router.post('/cleanup', async (_req: Request, res: Response) => {
-    try {
-      if (browserInstance && browserInstance.isConnected()) {
-        await browserInstance.close();
-        browserInstance = null;
-      }
-      const serviceResponse = new ServiceResponse(
-        ResponseStatus.Success,
-        'Browser instance cleaned up successfully',
-        null,
-        StatusCodes.OK
-      );
-      return handleServiceResponse(serviceResponse, res);
-    } catch (error) {
-      console.error(`Error cleaning up browser: ${(error as Error).message}`);
-      const serviceResponse = new ServiceResponse(
-        ResponseStatus.Failed,
-        `Error cleaning up browser: ${(error as Error).message}`,
-        null,
-        StatusCodes.INTERNAL_SERVER_ERROR
-      );
-      return handleServiceResponse(serviceResponse, res);
-    }
-  });
-
   return router;
 })();
-
-// Graceful shutdown handler
-process.on('SIGINT', async () => {
-  if (browserInstance && browserInstance.isConnected()) {
-    await browserInstance.close();
-  }
-});
-
-process.on('SIGTERM', async () => {
-  if (browserInstance && browserInstance.isConnected()) {
-    await browserInstance.close();
-  }
-});
