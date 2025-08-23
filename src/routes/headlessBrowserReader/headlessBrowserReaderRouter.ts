@@ -4,6 +4,7 @@ import express, { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { JSDOM } from 'jsdom';
 import puppeteer, { Browser, Page } from 'puppeteer';
+import { z } from 'zod';
 
 import { createApiResponse } from '@/api-docs/openAPIResponseBuilders';
 import { ResponseStatus, ServiceResponse } from '@/common/models/serviceResponse';
@@ -192,7 +193,13 @@ export const headlessBrowserReaderRouter: Router = (() => {
     request: {
       query: HeadlessBrowserReaderRequestParamSchema,
     },
-    responses: createApiResponse(HeadlessBrowserReaderResponseSchema, 'Success'),
+    responses: {
+      ...createApiResponse(HeadlessBrowserReaderResponseSchema, 'Success', StatusCodes.OK),
+      ...createApiResponse(z.null(), 'Bad Request', StatusCodes.BAD_REQUEST),
+      ...createApiResponse(z.null(), 'Unauthorized', StatusCodes.UNAUTHORIZED),
+      ...createApiResponse(z.null(), 'Too Many Requests', StatusCodes.TOO_MANY_REQUESTS),
+      ...createApiResponse(z.null(), 'Internal Server Error', StatusCodes.INTERNAL_SERVER_ERROR),
+    },
     security: [{ ApiKeyAuth: [] }],
   });
 
@@ -241,7 +248,11 @@ export const headlessBrowserReaderRouter: Router = (() => {
       method: 'post',
       path: '/api/headless-browser-reader/cleanup',
       tags: ['Headless Browser Reader'],
-      responses: createApiResponse(HeadlessBrowserReaderResponseSchema, 'Success'),
+      responses: {
+        ...createApiResponse(z.null(), 'Success', StatusCodes.OK),
+        ...createApiResponse(z.null(), 'Unauthorized', StatusCodes.UNAUTHORIZED),
+        ...createApiResponse(z.null(), 'Internal Server Error', StatusCodes.INTERNAL_SERVER_ERROR),
+      },
       security: [{ ApiKeyAuth: [] }],
     });
 

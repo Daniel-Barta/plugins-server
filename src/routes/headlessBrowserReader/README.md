@@ -122,6 +122,29 @@ The module supports two modes for browser instance management, controlled by the
 POST /api/headless-browser-reader/cleanup
 ```
 
+## API
+
+GET /api/headless-browser-reader/get-content
+
+- Query parameters:
+
+  - url (string, required): Target page URL. Must be http/https.
+  - waitForSelector (string, optional): CSS selector to wait for before extracting.
+  - timeout (number, optional, default 10000): 1000–30000 ms page load timeout.
+  - waitStrategy (enum, optional, default domcontentloaded): One of domcontentloaded | load | networkidle0 | networkidle2.
+
+- Responses:
+  - 200: { title: string; content: string; url: string }
+  - 400: Validation error
+  - 401: Missing/invalid API key
+  - 429: Rate limited
+  - 500: Internal error
+
+POST /api/headless-browser-reader/cleanup
+
+- Description: Closes the shared browser instance when REUSE_BROWSER_INSTANCE=true
+- Responses: 200/401/500
+
 #### Environment Configuration
 
 ```bash
