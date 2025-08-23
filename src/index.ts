@@ -2,8 +2,9 @@ import { env } from '@/common/utils/envConfig';
 import { app, logger } from '@/server';
 
 const port = env.PORT;
+const host = env.HOST;
 
-const server = app.listen(port, () => {
+const server = app.listen(port, host, () => {
   const { NODE_ENV, HOST } = env;
   logger.info(`Server (${NODE_ENV}) running on port http://${HOST}:${port}`);
 });

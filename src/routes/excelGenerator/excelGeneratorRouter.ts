@@ -17,16 +17,17 @@ export const excelGeneratorRegistry = new OpenAPIRegistry();
 excelGeneratorRegistry.register('ExcelGenerator', ExcelGeneratorResponseSchema);
 excelGeneratorRegistry.registerPath({
   method: 'post',
-  path: '/excel-generator/generate',
+  path: '/api/excel-generator/generate',
   tags: ['Excel Generator'],
   request: {
     body: createApiRequestBody(ExcelGeneratorRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(ExcelGeneratorResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 // Create folder to contains generated files
-const exportsDir = path.join(__dirname, '../../..', 'excel-exports');
+const exportsDir = path.join(__dirname, '../..', 'excel-exports');
 
 // Ensure the exports directory exists
 if (!fs.existsSync(exportsDir)) {

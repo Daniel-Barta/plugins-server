@@ -34,62 +34,68 @@ export const notionDatabaseRegistry = new OpenAPIRegistry();
 notionDatabaseRegistry.register('Notion Database', NotionDatabaseStructureViewerResponseSchema);
 notionDatabaseRegistry.registerPath({
   method: 'post',
-  path: '/notion-database/view-structure',
+  path: '/api/notion-database/view-structure',
   tags: ['Notion Database'],
   request: {
     body: createApiRequestBody(NotionDatabaseStructureViewerRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(NotionDatabaseStructureViewerResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 notionDatabaseRegistry.registerPath({
   method: 'post',
-  path: '/notion-database/create-page',
+  path: '/api/notion-database/create-page',
   tags: ['Notion Database'],
   request: {
     body: createApiRequestBody(NotionDatabaseCreatePageRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(NotionDatabaseCreatePageResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 notionDatabaseRegistry.registerPath({
   method: 'patch',
-  path: '/notion-database/update-page',
+  path: '/api/notion-database/update-page',
   tags: ['Notion Database'],
   request: {
     body: createApiRequestBody(NotionDatabaseUpdatePageRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(NotionDatabaseUpdatePageResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 notionDatabaseRegistry.registerPath({
   method: 'patch',
-  path: '/notion-database/archive-page',
+  path: '/api/notion-database/archive-page',
   tags: ['Notion Database'],
   request: {
     body: createApiRequestBody(NotionDatabaseArchivePageRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(NotionDatabaseArchivePageResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 notionDatabaseRegistry.registerPath({
   method: 'post',
-  path: '/notion-database/query-pages',
+  path: '/api/notion-database/query-pages',
   tags: ['Notion Database'],
   request: {
     body: createApiRequestBody(NotionDatabaseQueryPageRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(NotionDatabaseQueryPageResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 notionDatabaseRegistry.registerPath({
   method: 'post',
-  path: '/notion-database/create-database',
+  path: '/api/notion-database/create-database',
   tags: ['Notion Database'],
   request: {
     body: createApiRequestBody(NotionDatabaseMakerRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(NotionDatabaseMakerResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 const DEFAULT_ANNOTATIONS = {

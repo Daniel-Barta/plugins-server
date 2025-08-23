@@ -36,16 +36,17 @@ export const wordGeneratorRegistry = new OpenAPIRegistry();
 wordGeneratorRegistry.register('WordGenerator', WordGeneratorResponseSchema);
 wordGeneratorRegistry.registerPath({
   method: 'post',
-  path: '/word-generator/generate',
+  path: '/api/word-generator/generate',
   tags: ['Word Generator'],
   request: {
     body: createApiRequestBody(WordGeneratorRequestBodySchema, 'application/json'),
   },
   responses: createApiResponse(WordGeneratorResponseSchema, 'Success'),
+  security: [{ ApiKeyAuth: [] }],
 });
 
 // Create folder to contains generated files
-const exportsDir = path.join(__dirname, '../../..', 'word-exports');
+const exportsDir = path.join(__dirname, '../..', 'word-exports');
 // Ensure the exports directory exists
 if (!fs.existsSync(exportsDir)) {
   fs.mkdirSync(exportsDir, { recursive: true });

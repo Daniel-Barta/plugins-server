@@ -17,17 +17,18 @@ export const youtubeTranscriptRouter: Router = (() => {
 
   youtubeTranscriptRegistry.registerPath({
     method: 'get',
-    path: '/youtube-transcript/get-transcript',
+    path: '/api/youtube-transcript/get-transcript',
     tags: ['Youtube Transcript'],
     request: {
       query: YoutubeTranscriptRequestParamSchema,
     },
     responses: createApiResponse(YoutubeTranscriptResponseSchema, 'Success'),
+    security: [{ ApiKeyAuth: [] }],
   });
 
   router.get('/get-transcript', async (_req: Request, res: Response) => {
     console.log('Head to get-transcript');
-    const { query : videoId } = _req.query;
+    const { query: videoId } = _req.query;
     console.log('Head to get-transcript -> ', videoId);
 
     if (!videoId) {

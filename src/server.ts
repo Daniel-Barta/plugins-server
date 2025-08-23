@@ -5,12 +5,15 @@ import helmet from 'helmet';
 import { pino } from 'pino';
 
 import { openAPIRouter } from '@/api-docs/openAPIRouter';
+import { apiKeyAuth, optionalApiKeyAuth } from '@/common/middleware/apiKeyAuth';
 import errorHandler from '@/common/middleware/errorHandler';
 import rateLimiter from '@/common/middleware/rateLimiter';
 import requestLogger from '@/common/middleware/requestLogger';
 import { healthCheckRouter } from '@/routes/healthCheck/healthCheckRouter';
 
 import { excelGeneratorRouter } from './routes/excelGenerator/excelGeneratorRouter';
+import { fileReaderRouter } from './routes/fileReader/fileReaderRouter';
+import { headlessBrowserReaderRouter } from './routes/headlessBrowserReader/headlessBrowserReaderRouter';
 import { notionDatabaseRouter } from './routes/notionDatabase/notionDatabaseRouter';
 import { powerpointGeneratorRouter } from './routes/powerpointGenerator/powerpointGeneratorRouter';
 import { webPageReaderRouter } from './routes/webPageReader/webPageReaderRouter';
@@ -36,14 +39,16 @@ app.use((req, res, next) => {
 app.use(requestLogger());
 
 // Routes
-app.use('/health-check', healthCheckRouter);
-app.use('/images', express.static('public/images'));
-app.use('/youtube-transcript', youtubeTranscriptRouter);
-app.use('/web-page-reader', webPageReaderRouter);
-app.use('/powerpoint-generator', powerpointGeneratorRouter);
-app.use('/word-generator', wordGeneratorRouter);
-app.use('/excel-generator', excelGeneratorRouter);
-app.use('/notion-database', notionDatabaseRouter);
+app.use('/api/health-check', optionalApiKeyAuth, healthCheckRouter);
+app.use('/api/images', apiKeyAuth, express.static('public/images'));
+app.use('/api/youtube-transcript', apiKeyAuth, youtubeTranscriptRouter);
+app.use('/api/web-page-reader', apiKeyAuth, webPageReaderRouter);
+app.use('/api/file-reader', apiKeyAuth, fileReaderRouter);
+app.use('/api/headless-browser-reader', apiKeyAuth, headlessBrowserReaderRouter);
+app.use('/api/powerpoint-generator', apiKeyAuth, powerpointGeneratorRouter);
+app.use('/api/word-generator', apiKeyAuth, wordGeneratorRouter);
+app.use('/api/excel-generator', apiKeyAuth, excelGeneratorRouter);
+app.use('/api/notion-database', apiKeyAuth, notionDatabaseRouter);
 
 // Swagger UI
 app.use(openAPIRouter);

@@ -18,13 +18,28 @@ Plugins Server is open-sourced and is intended to be self-hosted by individual u
 
 **Note**: The Plugins Server only provides an endpoint for retrieving server-side processing results. To make the plugin work, you must also install a TypingMind's plugin configured to send requests to this server endpoint.
 
-## 🔌 How to use (for Typing Mind users)
+## � What's changed vs the original
 
-Two simple steps:
+This fork includes a few opinionated changes compared to the original TypingMind Plugins Server:
+
+- API key authentication added for most endpoints (`x-api-key` header or `?apiKey=`). Health check supports optional auth.
+- All routes are standardized under the `/api` prefix (breaking change for clients using old paths).
+- New endpoints:
+  - `/api/file-reader/get-content`: Fetch remote file content (auto base64 for binary).
+  - `/api/headless-browser-reader/get-content`: Puppeteer-based content extraction with anti-bot randomization and Readability; optional `/cleanup` when reusing browser instances.
+- OpenAPI docs updated and API key security scheme added.
+- Environment config expanded: `API_KEY`, `REUSE_BROWSER_INSTANCE`, `HEADLESS`, `HEADLESS_STEALTH_LEVEL`, `PUPPETEER_EXECUTABLE_PATH`, `HEADLESS_LAUNCH_EXTRA_ARGS`, and rate limiter params.
+- Server tweaks: trust proxy, configurable host binding, and rate limiter configuration.
+
+## �🔌 How to use (for Typing Mind users)
+
+Three simple steps:
 
 1. Deploy this repo on any hosting provider that supports NodeJS (e.g., Render.com, AWS, etc.). (We also provide a Dockerfile for easy deployment on Docker-supported hosting providers).
 
-2. Install your desired TypingMind's plugin. Update the server endpoint URL in your Settings page.
+2. **Set up API Key Authentication**: Configure the `API_KEY` environment variable on your deployment. This key will be required for all API requests.
+
+3. Install your desired TypingMind's plugin. Update the server endpoint URL in your Settings page and configure the API key in your plugin settings.
 
 Follow this guide for detailed instructions: [How to Deploy Plugins Server on Render.com](https://docs.typingmind.com/plugins/plugins-server/how-to-deploy-plugins-server-on-render)
 
