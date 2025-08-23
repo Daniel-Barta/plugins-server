@@ -1,5 +1,7 @@
 import { Page } from 'puppeteer';
 
+import { env } from '@/common/utils/envConfig';
+
 // User Agent pools for different browsers and operating systems
 export const getRandomUserAgent = (): string => {
   const userAgents = [
@@ -77,219 +79,211 @@ export const setRandomHeaders = async (page: Page): Promise<void> => {
     'en-CA,en;q=0.9',
   ];
 
-  const headers = {
+  const headers: Record<string, string> = {
     Accept:
       'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': acceptLanguages[Math.floor(Math.random() * acceptLanguages.length)],
-    'Accept-Encoding': 'gzip, deflate, br',
-    DNT: Math.random() > 0.5 ? '1' : '0', // Randomize Do Not Track
-    Connection: 'keep-alive',
     'Upgrade-Insecure-Requests': '1',
-    'Sec-Fetch-Dest': 'document',
-    'Sec-Fetch-Mode': 'navigate',
-    'Sec-Fetch-Site': 'none',
-    'Sec-Fetch-User': '?1',
     'Cache-Control': 'max-age=0',
   };
+  if (Math.random() > 0.5) headers.DNT = '1';
 
   await page.setExtraHTTPHeaders(headers);
 };
 
 // Advanced browser fingerprinting evasion
-export const setupBrowserEvasion = async (page: Page): Promise<void> => {
+export const setupBrowserEvasion = async (
+  page: Page,
+  level: 'light' | 'standard' | 'aggressive' = env.HEADLESS_STEALTH_LEVEL as 'light' | 'standard' | 'aggressive'
+): Promise<void> => {
+  // Minimal evasion
   await page.evaluateOnNewDocument(() => {
-    // Remove webdriver property
     Object.defineProperty(navigator, 'webdriver', {
       get: () => undefined,
     });
-
-    // Override the plugins property to use a fake plugin array
-    Object.defineProperty(navigator, 'plugins', {
-      get: () => [
-        {
-          0: {
-            type: 'application/x-google-chrome-pdf',
-            suffixes: 'pdf',
-            description: 'Portable Document Format',
-            enabledPlugin: null,
-          },
-          description: 'Portable Document Format',
-          filename: 'internal-pdf-viewer',
-          length: 1,
-          name: 'Chrome PDF Plugin',
-        },
-        {
-          0: {
-            type: 'application/pdf',
-            suffixes: 'pdf',
-            description: '',
-            enabledPlugin: null,
-          },
-          description: '',
-          filename: 'mhjfbmdgcfjbbpaeojofohoefgiehjai',
-          length: 1,
-          name: 'Chrome PDF Viewer',
-        },
-        {
-          0: {
-            type: 'application/x-nacl',
-            suffixes: '',
-            description: 'Native Client Executable',
-            enabledPlugin: null,
-          },
-          1: {
-            type: 'application/x-pnacl',
-            suffixes: '',
-            description: 'Portable Native Client Executable',
-            enabledPlugin: null,
-          },
-          description: '',
-          filename: 'internal-nacl-plugin',
-          length: 2,
-          name: 'Native Client',
-        },
-      ],
-    });
-
-    // Mock chrome object
-    (window as any).chrome = {
-      runtime: {},
-      loadTimes: function () {
-        const connectionInfo = ['http/1.1', 'h2', 'http/1.0'][Math.floor(Math.random() * 3)];
-        const navigationType = ['Other', 'Link', 'Reload'][Math.floor(Math.random() * 3)];
-
-        return {
-          commitLoadTime: Date.now() / 1000 - Math.random() * 100,
-          connectionInfo,
-          finishDocumentLoadTime: Date.now() / 1000 - Math.random() * 100,
-          finishLoadTime: Date.now() / 1000 - Math.random() * 100,
-          firstPaintAfterLoadTime: 0,
-          firstPaintTime: Date.now() / 1000 - Math.random() * 100,
-          navigationType,
-          npnNegotiatedProtocol: connectionInfo,
-          requestTime: Date.now() / 1000 - Math.random() * 100,
-          startLoadTime: Date.now() / 1000 - Math.random() * 100,
-          wasAlternateProtocolAvailable: Math.random() > 0.5,
-          wasFetchedViaSpdy: Math.random() > 0.5,
-          wasNpnNegotiated: Math.random() > 0.5,
-        };
-      },
-    };
-
-    // Randomize language preferences
-    const languages = [
-      ['en-US', 'en'],
-      ['en-GB', 'en'],
-      ['en-CA', 'en', 'fr'],
-      ['en-US', 'en', 'es'],
-    ];
-    const randomLanguages = languages[Math.floor(Math.random() * languages.length)];
-
-    Object.defineProperty(navigator, 'languages', {
-      get: () => randomLanguages,
-    });
-
-    Object.defineProperty(navigator, 'language', {
-      get: () => randomLanguages[0],
-    });
-
-    // Mock permissions
-    const originalQuery = (window as any).navigator.permissions?.query;
-    if (originalQuery) {
-      (window as any).navigator.permissions.query = (parameters: any) =>
-        parameters.name === 'notifications'
-          ? Promise.resolve({ state: Notification.permission })
-          : originalQuery(parameters);
-    }
-
-    // Mock hardware concurrency (CPU cores)
-    const cores = [2, 4, 6, 8, 12, 16][Math.floor(Math.random() * 6)];
-    Object.defineProperty(navigator, 'hardwareConcurrency', {
-      get: () => cores,
-    });
-
-    // Mock device memory (in GB)
-    const memory = [2, 4, 8, 16][Math.floor(Math.random() * 4)];
-    Object.defineProperty(navigator, 'deviceMemory', {
-      get: () => memory,
-    });
-
-    // Mock screen properties
-    Object.defineProperty(screen, 'colorDepth', {
-      get: () => 24,
-    });
-
-    Object.defineProperty(screen, 'pixelDepth', {
-      get: () => 24,
-    });
-
-    Date.prototype.getTimezoneOffset = function () {
-      // Return a random but consistent timezone offset
-      const offsets = [-300, -480, -360, -420, 0, 60, 540]; // Different timezone offsets
-      return offsets[Math.floor(Math.random() * offsets.length)];
-    };
-
-    // Mock WebRTC to prevent IP leaks
-    const originalRTCPeerConnection = (window as any).RTCPeerConnection;
-    (window as any).RTCPeerConnection = function (...args: any[]) {
-      const pc = new originalRTCPeerConnection(...args);
-
-      // Override createDataChannel to add some realistic behavior
-      const originalCreateDataChannel = pc.createDataChannel;
-      pc.createDataChannel = function (...args: any[]) {
-        return originalCreateDataChannel.apply(this, args);
-      };
-
-      return pc;
-    };
-
-    // Mock getUserMedia for webcam/microphone permissions
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia = function () {
-        return Promise.reject(new DOMException('Permission denied', 'NotAllowedError'));
-      };
-    }
-
-    // Mock battery API
-    if ('getBattery' in navigator) {
-      (navigator as any).getBattery = () =>
-        Promise.resolve({
-          charging: Math.random() > 0.5,
-          chargingTime: Math.random() * 10000,
-          dischargingTime: Math.random() * 10000,
-          level: Math.random(),
-          addEventListener: () => {},
-          removeEventListener: () => {},
-        });
-    }
-
-    // Mock canvas fingerprinting protection with simpler approach
-    const originalToDataURL = HTMLCanvasElement.prototype.toDataURL;
-    HTMLCanvasElement.prototype.toDataURL = function (type?: string, quality?: number) {
-      // Add tiny noise to prevent canvas fingerprinting
-      const imageData = originalToDataURL.call(this, type, quality);
-      // Return slightly modified data to prevent fingerprinting - just add noise to end
-      const noise = Math.random().toString(36).substring(2, 4);
-      return imageData.replace(/=+$/, '') + noise + '==';
-    };
-
-    // Mock WebGL fingerprinting protection
-    const originalGetParameter = WebGLRenderingContext.prototype.getParameter;
-    WebGLRenderingContext.prototype.getParameter = function (parameter) {
-      // Randomize some WebGL parameters to prevent fingerprinting
-      if (parameter === 37445) {
-        // UNMASKED_VENDOR_WEBGL
-        const vendors = ['Intel Inc.', 'NVIDIA Corporation', 'ATI Technologies Inc.'];
-        return vendors[Math.floor(Math.random() * vendors.length)];
-      }
-      if (parameter === 37446) {
-        // UNMASKED_RENDERER_WEBGL
-        const renderers = ['Intel Iris OpenGL Engine', 'NVIDIA GeForce GTX 1060', 'AMD Radeon R9 200 Series'];
-        return renderers[Math.floor(Math.random() * renderers.length)];
-      }
-      return originalGetParameter.call(this, parameter);
-    };
   });
+
+  if (level === 'standard' || level === 'aggressive') {
+    await page.evaluateOnNewDocument(() => {
+      // Override the plugins property to use a fake plugin array
+      Object.defineProperty(navigator, 'plugins', {
+        get: () => [
+          {
+            0: {
+              type: 'application/x-google-chrome-pdf',
+              suffixes: 'pdf',
+              description: 'Portable Document Format',
+              enabledPlugin: null,
+            },
+            description: 'Portable Document Format',
+            filename: 'internal-pdf-viewer',
+            length: 1,
+            name: 'Chrome PDF Plugin',
+          },
+          {
+            0: {
+              type: 'application/pdf',
+              suffixes: 'pdf',
+              description: '',
+              enabledPlugin: null,
+            },
+            description: '',
+            filename: 'mhjfbmdgcfjbbpaeojofohoefgiehjai',
+            length: 1,
+            name: 'Chrome PDF Viewer',
+          },
+          {
+            0: {
+              type: 'application/x-nacl',
+              suffixes: '',
+              description: 'Native Client Executable',
+              enabledPlugin: null,
+            },
+            1: {
+              type: 'application/x-pnacl',
+              suffixes: '',
+              description: 'Portable Native Client Executable',
+              enabledPlugin: null,
+            },
+            description: '',
+            filename: 'internal-nacl-plugin',
+            length: 2,
+            name: 'Native Client',
+          },
+        ],
+      });
+
+      // Mock chrome object
+      (window as any).chrome = {
+        runtime: {},
+        loadTimes: function () {
+          const connectionInfo = ['http/1.1', 'h2', 'http/1.0'][Math.floor(Math.random() * 3)];
+          const navigationType = ['Other', 'Link', 'Reload'][Math.floor(Math.random() * 3)];
+
+          return {
+            commitLoadTime: Date.now() / 1000 - Math.random() * 100,
+            connectionInfo,
+            finishDocumentLoadTime: Date.now() / 1000 - Math.random() * 100,
+            finishLoadTime: Date.now() / 1000 - Math.random() * 100,
+            firstPaintAfterLoadTime: 0,
+            firstPaintTime: Date.now() / 1000 - Math.random() * 100,
+            navigationType,
+            npnNegotiatedProtocol: connectionInfo,
+            requestTime: Date.now() / 1000 - Math.random() * 100,
+            startLoadTime: Date.now() / 1000 - Math.random() * 100,
+            wasAlternateProtocolAvailable: Math.random() > 0.5,
+            wasFetchedViaSpdy: Math.random() > 0.5,
+            wasNpnNegotiated: Math.random() > 0.5,
+          };
+        },
+      };
+
+      // Randomize language preferences
+      const languages = [
+        ['en-US', 'en'],
+        ['en-GB', 'en'],
+        ['en-CA', 'en', 'fr'],
+        ['en-US', 'en', 'es'],
+      ];
+      const randomLanguages = languages[Math.floor(Math.random() * languages.length)];
+
+      Object.defineProperty(navigator, 'languages', {
+        get: () => randomLanguages,
+      });
+
+      Object.defineProperty(navigator, 'language', {
+        get: () => randomLanguages[0],
+      });
+
+      // Mock permissions
+      const originalQuery = (window as any).navigator.permissions?.query;
+      if (originalQuery) {
+        (window as any).navigator.permissions.query = (parameters: any) =>
+          parameters.name === 'notifications'
+            ? Promise.resolve({ state: Notification.permission })
+            : originalQuery(parameters);
+      }
+
+      // Mock hardware concurrency (CPU cores)
+      const cores = [2, 4, 6, 8, 12, 16][Math.floor(Math.random() * 6)];
+      Object.defineProperty(navigator, 'hardwareConcurrency', {
+        get: () => cores,
+      });
+
+      // Mock device memory (in GB)
+      const memory = [2, 4, 8, 16][Math.floor(Math.random() * 4)];
+      Object.defineProperty(navigator, 'deviceMemory', {
+        get: () => memory,
+      });
+
+      // Mock screen properties
+      Object.defineProperty(screen, 'colorDepth', {
+        get: () => 24,
+      });
+
+      Object.defineProperty(screen, 'pixelDepth', {
+        get: () => 24,
+      });
+
+      Date.prototype.getTimezoneOffset = function () {
+        const offsets = [-300, -480, -360, -420, 0, 60, 540];
+        return offsets[Math.floor(Math.random() * offsets.length)];
+      };
+    });
+  }
+
+  if (level === 'aggressive') {
+    await page.evaluateOnNewDocument(() => {
+      // Mock WebRTC to prevent IP leaks
+      const originalRTCPeerConnection = (window as any).RTCPeerConnection;
+      (window as any).RTCPeerConnection = function (...args: any[]) {
+        const pc = new originalRTCPeerConnection(...args);
+        const originalCreateDataChannel = pc.createDataChannel;
+        pc.createDataChannel = function (...args: any[]) {
+          return originalCreateDataChannel.apply(this, args);
+        };
+        return pc;
+      };
+
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia = function () {
+          return Promise.reject(new DOMException('Permission denied', 'NotAllowedError'));
+        };
+      }
+
+      if ('getBattery' in navigator) {
+        (navigator as any).getBattery = () =>
+          Promise.resolve({
+            charging: Math.random() > 0.5,
+            chargingTime: Math.random() * 10000,
+            dischargingTime: Math.random() * 10000,
+            level: Math.random(),
+            addEventListener: () => {},
+            removeEventListener: () => {},
+          });
+      }
+
+      const originalToDataURL = HTMLCanvasElement.prototype.toDataURL;
+      HTMLCanvasElement.prototype.toDataURL = function (type?: string, quality?: number) {
+        const imageData = originalToDataURL.call(this, type, quality);
+        const noise = Math.random().toString(36).substring(2, 4);
+        return imageData.replace(/=+$/, '') + noise + '==';
+      };
+
+      const originalGetParameter = WebGLRenderingContext.prototype.getParameter;
+      WebGLRenderingContext.prototype.getParameter = function (parameter) {
+        if (parameter === 37445) {
+          const vendors = ['Intel Inc.', 'NVIDIA Corporation', 'ATI Technologies Inc.'];
+          return vendors[Math.floor(Math.random() * vendors.length)];
+        }
+        if (parameter === 37446) {
+          const renderers = ['Intel Iris OpenGL Engine', 'NVIDIA GeForce GTX 1060', 'AMD Radeon R9 200 Series'];
+          return renderers[Math.floor(Math.random() * renderers.length)];
+        }
+        return originalGetParameter.call(this, parameter);
+      };
+    });
+  }
 };
 
 // Simulate human-like mouse movements
@@ -328,13 +322,9 @@ export const getRandomizedLaunchArgs = (): string[] => {
     '--no-sandbox',
     '--disable-setuid-sandbox',
     '--disable-dev-shm-usage',
-    '--disable-accelerated-2d-canvas',
     '--no-first-run',
     '--no-zygote',
-    '--disable-gpu',
-    '--disable-blink-features=AutomationControlled',
     '--disable-extensions',
-    '--disable-plugins',
     '--disable-default-apps',
     '--disable-background-timer-throttling',
     '--disable-backgrounding-occluded-windows',
@@ -342,27 +332,25 @@ export const getRandomizedLaunchArgs = (): string[] => {
     '--disable-features=TranslateUI',
     '--disable-ipc-flooding-protection',
     '--no-default-browser-check',
-    '--disable-web-security',
-    '--disable-features=VizDisplayCompositor',
-    '--disable-client-side-phishing-detection',
   ];
 
-  // Add some randomized arguments
-  const randomArgs = [];
+  const args = [...baseArgs];
+  if (env.HEADLESS) args.push('--disable-gpu');
+  if (env.HEADLESS_STEALTH_LEVEL !== 'light') args.push('--disable-blink-features=AutomationControlled');
 
-  // Randomly add memory pressure simulation
-  if (Math.random() > 0.5) {
-    randomArgs.push('--memory-pressure-off');
+  if (env.HEADLESS_STEALTH_LEVEL === 'aggressive') {
+    if (Math.random() > 0.5) args.push('--memory-pressure-off');
+    const processLimit = [1, 2, 4][Math.floor(Math.random() * 3)];
+    args.push(`--renderer-process-limit=${processLimit}`);
+    if (Math.random() > 0.5) args.push('--disable-smooth-scrolling');
   }
 
-  // Randomly add different renderer process limits
-  const processLimit = [1, 2, 4][Math.floor(Math.random() * 3)];
-  randomArgs.push(`--renderer-process-limit=${processLimit}`);
-
-  // Randomly enable/disable smooth scrolling
-  if (Math.random() > 0.5) {
-    randomArgs.push('--disable-smooth-scrolling');
+  if (env.HEADLESS_LAUNCH_EXTRA_ARGS) {
+    const extra = env.HEADLESS_LAUNCH_EXTRA_ARGS.split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    args.push(...extra);
   }
 
-  return [...baseArgs, ...randomArgs];
+  return args;
 };

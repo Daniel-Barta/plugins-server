@@ -24,8 +24,17 @@ export const env = cleanEnv(process.env, {
     desc: 'Run Puppeteer in headless mode',
     default: true,
   }),
+  HEADLESS_STEALTH_LEVEL: str({
+    desc: 'Stealth level for anti-bot evasion: light | standard | aggressive',
+    choices: ['light', 'standard', 'aggressive'],
+    default: 'aggressive',
+  }),
   PUPPETEER_EXECUTABLE_PATH: str({
     desc: 'Optional custom executable path for puppeteer',
     default: undefined,
+  }),
+  HEADLESS_LAUNCH_EXTRA_ARGS: str({
+    desc: 'Comma-separated extra Chromium args to append to launch',
+    default: '',
   }),
 });
