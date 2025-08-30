@@ -3,7 +3,9 @@ import { Readability } from '@mozilla/readability';
 import express, { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { JSDOM } from 'jsdom';
-import puppeteer, { Browser, Page } from 'puppeteer';
+import type { Browser, Page } from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import { z } from 'zod';
 
 import { createApiResponse } from '@/api-docs/openAPIResponseBuilders';
@@ -30,6 +32,9 @@ headlessBrowserReaderRegistry.register('Headless Browser Reader', HeadlessBrowse
 
 // Global browser instance for reuse mode (when REUSE_BROWSER_INSTANCE=true)
 let browserInstance: Browser | null = null;
+
+// Enable stealth plugin globally to evade common bot detections
+puppeteer.use(StealthPlugin());
 
 const createNewBrowserInstance = async (): Promise<Browser> => {
   const browser = await puppeteer.launch({
