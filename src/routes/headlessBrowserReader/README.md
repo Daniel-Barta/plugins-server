@@ -73,7 +73,7 @@ The randomization is automatic and requires no additional configuration:
 const content = await fetchContentWithHeadlessBrowser(
   'https://example.com',
   '.content', // optional selector to wait for
-  10000, // timeout in ms
+  15000, // timeout in ms
   'domcontentloaded' // wait strategy
 );
 ```
@@ -130,7 +130,7 @@ GET /api/headless-browser-reader/get-content
 
   - url (string, required): Target page URL. Must be http/https.
   - waitForSelector (string, optional): CSS selector to wait for before extracting.
-  - timeout (number, optional, default 10000): 1000–30000 ms page load timeout.
+  - timeout (number, optional, default 15000): 1000–30000 ms page load timeout.
   - waitStrategy (enum, optional, default domcontentloaded): One of domcontentloaded | load | networkidle0 | networkidle2.
 
 - Responses:

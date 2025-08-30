@@ -56,7 +56,7 @@ const getBrowserInstance = async (): Promise<Browser> => {
 const fetchContentWithHeadlessBrowser = async (
   url: string,
   waitForSelector?: string,
-  timeout: number = 10000,
+  timeout: number = 15000,
   waitStrategy: 'domcontentloaded' | 'load' | 'networkidle0' | 'networkidle2' = 'domcontentloaded'
 ) => {
   // Choose browser strategy based on environment variable
@@ -222,7 +222,7 @@ export const headlessBrowserReaderRouter: Router = (() => {
       const content = await fetchContentWithHeadlessBrowser(
         url,
         waitForSelector,
-        timeout ?? 10000,
+        timeout ?? 15000,
         waitStrategy ?? 'domcontentloaded'
       );
 

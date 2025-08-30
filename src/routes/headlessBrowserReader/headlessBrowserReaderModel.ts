@@ -32,11 +32,11 @@ export const HeadlessBrowserReaderRequestParamSchema = z.object({
     .int()
     .min(1000, 'Timeout must be a number between 1000 and 30000')
     .max(30000, 'Timeout must be a number between 1000 and 30000')
-    .default(10000)
+    .default(15000)
     .optional()
     .openapi({
-      example: 10000,
-      description: 'Timeout in milliseconds for page loading (1000-30000, default: 10000)',
+      example: 15000,
+      description: 'Timeout in milliseconds for page loading (1000-30000, default: 15000)',
     }),
   waitStrategy: z
     .enum(['domcontentloaded', 'load', 'networkidle0', 'networkidle2'])
