@@ -127,7 +127,6 @@ POST /api/headless-browser-reader/cleanup
 GET /api/headless-browser-reader/get-content
 
 - Query parameters:
-
   - url (string, required): Target page URL. Must be http/https.
   - waitForSelector (string, optional): CSS selector to wait for before extracting.
   - timeout (number, optional, default 15000): 1000–30000 ms page load timeout.
