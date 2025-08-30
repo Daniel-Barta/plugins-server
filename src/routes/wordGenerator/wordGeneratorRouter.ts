@@ -38,6 +38,9 @@ wordGeneratorRegistry.registerPath({
   method: 'post',
   path: '/api/word-generator/generate',
   tags: ['Word Generator'],
+  operationId: 'generateWordDocument',
+  summary: 'Generate a Word document (DOCX)',
+  description: 'Creates a DOCX document from structured content and returns a download path.',
   request: {
     body: createApiRequestBody(WordGeneratorRequestBodySchema, 'application/json'),
   },

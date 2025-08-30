@@ -19,6 +19,9 @@ export const youtubeTranscriptRouter: Router = (() => {
     method: 'get',
     path: '/api/youtube-transcript/get-transcript',
     tags: ['Youtube Transcript'],
+    operationId: 'getYoutubeTranscript',
+    summary: 'Get YouTube transcript',
+    description: 'Fetches the transcript text for a given YouTube video ID.',
     request: {
       query: YoutubeTranscriptRequestParamSchema,
     },

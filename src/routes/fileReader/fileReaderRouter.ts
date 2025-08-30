@@ -97,6 +97,10 @@ export const fileReaderRouter: Router = (() => {
     method: 'get',
     path: '/api/file-reader/get-content',
     tags: ['File Reader'],
+    operationId: 'getFileContent',
+    summary: 'Fetch file content from a URL',
+    description:
+      'Downloads a file from the provided URL and returns its content. Text files are returned as UTF-8, while binary files are returned as base64 along with MIME type and size.',
     request: {
       query: FileReaderRequestParamSchema,
     },

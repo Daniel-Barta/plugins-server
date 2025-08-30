@@ -19,6 +19,9 @@ excelGeneratorRegistry.registerPath({
   method: 'post',
   path: '/api/excel-generator/generate',
   tags: ['Excel Generator'],
+  operationId: 'generateExcelSpreadsheet',
+  summary: 'Generate an Excel spreadsheet (XLSX)',
+  description: 'Creates an XLSX workbook from structured table input and returns a download path.',
   request: {
     body: createApiRequestBody(ExcelGeneratorRequestBodySchema, 'application/json'),
   },

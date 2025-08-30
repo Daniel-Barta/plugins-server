@@ -36,6 +36,9 @@ notionDatabaseRegistry.registerPath({
   method: 'post',
   path: '/api/notion-database/view-structure',
   tags: ['Notion Database'],
+  operationId: 'viewNotionDatabaseStructure',
+  summary: 'View Notion database structure',
+  description: 'Retrieves the schema/properties of a Notion database by ID.',
   request: {
     body: createApiRequestBody(NotionDatabaseStructureViewerRequestBodySchema, 'application/json'),
   },
@@ -47,6 +50,9 @@ notionDatabaseRegistry.registerPath({
   method: 'post',
   path: '/api/notion-database/create-page',
   tags: ['Notion Database'],
+  operationId: 'createNotionPage',
+  summary: 'Create a Notion page',
+  description: 'Creates a new page in a Notion database with provided properties.',
   request: {
     body: createApiRequestBody(NotionDatabaseCreatePageRequestBodySchema, 'application/json'),
   },
@@ -58,6 +64,9 @@ notionDatabaseRegistry.registerPath({
   method: 'patch',
   path: '/api/notion-database/update-page',
   tags: ['Notion Database'],
+  operationId: 'updateNotionPage',
+  summary: 'Update a Notion page',
+  description: 'Updates properties of an existing page in a Notion database.',
   request: {
     body: createApiRequestBody(NotionDatabaseUpdatePageRequestBodySchema, 'application/json'),
   },
@@ -69,6 +78,9 @@ notionDatabaseRegistry.registerPath({
   method: 'patch',
   path: '/api/notion-database/archive-page',
   tags: ['Notion Database'],
+  operationId: 'archiveNotionPage',
+  summary: 'Archive a Notion page',
+  description: 'Archives a page in Notion (soft-delete).',
   request: {
     body: createApiRequestBody(NotionDatabaseArchivePageRequestBodySchema, 'application/json'),
   },
@@ -80,6 +92,9 @@ notionDatabaseRegistry.registerPath({
   method: 'post',
   path: '/api/notion-database/query-pages',
   tags: ['Notion Database'],
+  operationId: 'queryNotionPages',
+  summary: 'Query Notion pages',
+  description: 'Queries pages in a Notion database with filter/sort/pagination.',
   request: {
     body: createApiRequestBody(NotionDatabaseQueryPageRequestBodySchema, 'application/json'),
   },
@@ -91,6 +106,9 @@ notionDatabaseRegistry.registerPath({
   method: 'post',
   path: '/api/notion-database/create-database',
   tags: ['Notion Database'],
+  operationId: 'createNotionDatabase',
+  summary: 'Create a Notion database',
+  description: 'Creates a Notion database with properties built from the provided schema.',
   request: {
     body: createApiRequestBody(NotionDatabaseMakerRequestBodySchema, 'application/json'),
   },
