@@ -21,6 +21,9 @@ powerpointGeneratorRegistry.registerPath({
   method: 'post',
   path: '/api/powerpoint-generator/generate',
   tags: ['Powerpoint Generator'],
+  operationId: 'generatePowerPoint',
+  summary: 'Generate a PowerPoint presentation (PPTX)',
+  description: 'Creates a PPTX presentation from structured slides input and returns a download path.',
   request: {
     body: createApiRequestBody(PowerpointGeneratorRequestBodySchema, 'application/json'),
   },

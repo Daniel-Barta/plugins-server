@@ -66,6 +66,9 @@ export const webPageReaderRouter: Router = (() => {
     method: 'get',
     path: '/api/web-page-reader/get-content',
     tags: ['Web Page Reader'],
+    operationId: 'getWebPageContent',
+    summary: 'Extract readable content from a web page',
+    description: 'Downloads a public web page, removes boilerplate, and extracts article-like readable text content.',
     request: {
       query: WebPageReaderRequestParamSchema,
     },

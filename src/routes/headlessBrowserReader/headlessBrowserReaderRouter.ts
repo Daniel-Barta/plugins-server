@@ -190,6 +190,10 @@ export const headlessBrowserReaderRouter: Router = (() => {
     method: 'get',
     path: '/api/headless-browser-reader/get-content',
     tags: ['Headless Browser Reader'],
+    operationId: 'getHeadlessBrowserContent',
+    summary: 'Load page with Puppeteer and extract content',
+    description:
+      'Loads a page in a headless browser with anti-bot randomization and returns the readable article text.',
     request: {
       query: HeadlessBrowserReaderRequestParamSchema,
     },
@@ -248,6 +252,9 @@ export const headlessBrowserReaderRouter: Router = (() => {
       method: 'post',
       path: '/api/headless-browser-reader/cleanup',
       tags: ['Headless Browser Reader'],
+      operationId: 'cleanupHeadlessBrowser',
+      summary: 'Cleanup shared browser instance',
+      description: 'Closes the shared Puppeteer browser instance when reuse mode is enabled.',
       responses: {
         ...createApiResponse(z.null(), 'Success', StatusCodes.OK),
         ...createApiResponse(z.null(), 'Unauthorized', StatusCodes.UNAUTHORIZED),
