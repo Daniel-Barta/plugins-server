@@ -87,6 +87,14 @@ const fetchContentWithHeadlessBrowser = async (
       timeout,
     });
 
+    // Some pages (e.g., OpenAI docs) may require a reload to fully render content
+    // Perform a safe reload using the same wait strategy
+    try {
+      await page.reload({ waitUntil: waitStrategy, timeout });
+    } catch (_e) {
+      // Ignore reload failures and proceed with the initially loaded content
+    }
+
     // Random delay after page load (simulate reading time)
     const readingDelay = getRandomDelay(1000, 3000);
     await new Promise((resolve) => setTimeout(resolve, readingDelay));
